@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Bus Tracker - Student View</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div>
+                <h1>🚌 College Bus Tracker</h1>
+                <p>Real-time bus location tracking</p>
+            </div>
+            <a href="/driver" class="driver-link">Driver Login →</a>
+        </div>
+    </header>
+
+    <main class="student-view">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">👥</span>
+                <h2>Live Bus Locations</h2>
+            </div>
+
+            <div class="top-controls">
+                <button id="track-bus" class="btn-track">Start Tracking</button>
+                <div class="update-time">
+                    <span>🕐</span>
+                    <span id="last-update">Last update: -</span>
+                </div>
+            </div>
+
+            <div id="error-box" class="warning-box" style="display: none;">
+                ⚠️ <span id="error-message"></span>
+            </div>
+
+            <div id="map"></div>
+
+            <div id="bus-list" class="bus-list"></div>
+
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <p class="stat-label">Status</p>
+                    <p class="stat-value" id="tracking-status">Not Tracking</p>
+                </div>
+                <div class="stat-card green">
+                    <p class="stat-label">Active Buses</p>
+                    <p class="stat-value" id="active-buses">0</p>
+                </div>
+                <div class="stat-card purple">
+                    <p class="stat-label">Refresh Rate</p>
+                    <p class="stat-value">3 seconds</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>How to Use</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <p class="info-title">👨‍🎓 For Students:</p>
+                    <p>Click "Start Tracking" to see all active buses on the map. No login required!</p>
+                </div>
+                <div class="info-card">
+                    <p class="info-title">🚌 For Drivers:</p>
+                    <p>Click "Driver Login" above to access the driver dashboard and share your location.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>College Bus Tracker • Real-time GPS tracking</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='student.js') }}"></script>
+</body>
+</html>

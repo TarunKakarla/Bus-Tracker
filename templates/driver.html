@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - College Bus Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div>
+                <h1>🚌 Driver Dashboard</h1>
+                <p>Welcome, <strong>{{ username }}</strong></p>
+            </div>
+            <a href="/logout" class="driver-link">Logout →</a>
+        </div>
+    </header>
+
+    <main class="driver-view">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">📡</span>
+                <h2>Location Sharing</h2>
+            </div>
+
+            <div class="button-group">
+                <button id="start-sharing" class="btn-start">Start Sharing Location</button>
+                <button id="stop-sharing" class="btn-stop" disabled>Stop Sharing</button>
+            </div>
+
+            <div class="status-box">
+                <p class="status-label">📍 Status</p>
+                <p id="driver-status">Not sharing</p>
+                <p id="last-sent" class="status-time"></p>
+            </div>
+
+            <div id="driver-map" style="height: 400px; margin: 1rem 0; border-radius: 0.75rem;"></div>
+
+            <div class="info-box">
+                <strong>💡 Important:</strong> Keep this page open while driving. Your location will update automatically every few seconds.
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card green">
+                    <p class="stat-label">Sharing Status</p>
+                    <p class="stat-value" id="sharing-status">Inactive</p>
+                </div>
+                <div class="stat-card blue">
+                    <p class="stat-label">Updates Sent</p>
+                    <p class="stat-value" id="updates-count">0</p>
+                </div>
+                <div class="stat-card purple">
+                    <p class="stat-label">Accuracy</p>
+                    <p class="stat-value" id="accuracy-display">-</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>Driver Instructions</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <p class="info-title">📱 Keep Page Open:</p>
+                    <p>Don't close this tab while driving. Your phone can be locked, but keep the browser running.</p>
+                </div>
+                <div class="info-card">
+                    <p class="info-title">🔋 Battery Usage:</p>
+                    <p>GPS tracking uses battery. Consider keeping your phone charged while sharing location.</p>
+                </div>
+                <div class="info-card">
+                    <p class="info-title">🔒 Privacy:</p>
+                    <p>Your location is only visible while you're actively sharing. Stop sharing when done.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>College Bus Tracker • Driver Dashboard</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='driver.js') }}"></script>
+</body>
+</html>

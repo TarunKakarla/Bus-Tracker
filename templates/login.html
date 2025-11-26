@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Login - College Bus Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div>
+                <h1>🚌 Driver Login</h1>
+                <p>Access your driver dashboard</p>
+            </div>
+            <a href="/" class="driver-link">← Back to Map</a>
+        </div>
+    </header>
+
+    <main class="login-page">
+        <div class="login-container">
+            <div class="login-box">
+                <h2>Driver Login</h2>
+                <p class="login-subtitle">Enter your credentials to start sharing location</p>
+
+                <div id="login-error" class="error-message" style="display: none;"></div>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="btn-login">Login</button>
+                </form>
+
+                <div class="demo-credentials">
+                    <p><strong>Demo Credentials:</strong></p>
+                    <p>Username: <code>driver1</code> | Password: <code>pass123</code></p>
+                    <p>Username: <code>driver2</code> | Password: <code>pass456</code></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='login.js') }}"></script>
+</body>
+</html>

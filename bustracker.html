@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Bus Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-content h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .header-content p {
+            color: #bfdbfe;
+            font-size: 0.875rem;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-start {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: #15803d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-stop {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-stop:hover:not(:disabled) {
+            background: #b91c1c;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-track {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-track:hover {
+            background: #4338ca;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .status-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-box p {
+            margin: 0.25rem 0;
+            color: #374151;
+        }
+
+        .status-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            color: #1e40af;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            color: #92400e;
+            margin-bottom: 1rem;
+        }
+
+        #map {
+            height: 500px;
+            border-radius: 0.75rem;
+            border: 2px solid #d1d5db;
+            margin: 1rem 0;
+        }
+
+        .location-info {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 1rem;
+        }
+
+        .location-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .location-coords {
+            font-family: 'Courier New', monospace;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #4f46e5;
+        }
+
+        .location-accuracy {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid;
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-color: #93c5fd;
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: #86efac;
+        }
+
+        .stat-card.purple {
+            background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+            border-color: #c084fc;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .info-section {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .info-section h3 {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .info-card p {
+            margin: 0.5rem 0 0 0;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .update-time {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .stale {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom marker styling */
+        .bus-marker {
+            background: #16a34a;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div>
+                <h1>🚌 College Bus Tracker</h1>
+                <p>Real-time GPS location tracking with interactive map</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Driver Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">📡</span>
+                <h2>Driver Dashboard</h2>
+            </div>
+
+            <div class="button-group">
+                <button id="start-sharing" class="btn-start">Start Sharing Location</button>
+                <button id="stop-sharing" class="btn-stop" disabled>Stop Sharing</button>
+            </div>
+
+            <div class="status-box">
+                <p class="status-label">📍 Status</p>
+                <p id="driver-status">Not sharing</p>
+                <p id="last-sent" style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.5rem;"></p>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Tip:</strong> Keep this page open and allow location permissions for continuous tracking.
+            </div>
+        </div>
+
+        <!-- Student Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="icon">👥</span>
+                <h2>Student View - Live Map</h2>
+            </div>
+
+            <div class="top-controls">
+                <button id="track-bus" class="btn-track">Start Tracking Bus</button>
+                <div class="update-time">
+                    <span>🕐</span>
+                    <span id="last-update">Last update: -</span>
+                </div>
+            </div>
+
+            <div id="error-box" class="warning-box" style="display: none;">
+                ⚠️ <span id="error-message"></span>
+            </div>
+
+            <!-- Leaflet Map -->
+            <div id="map"></div>
+
+            <!-- Location Info Card -->
+            <div class="location-info" id="location-info" style="display: none;">
+                <p class="location-label">📍 Current Bus Location</p>
+                <p class="location-coords" id="coords-display">-</p>
+                <p class="location-accuracy" id="accuracy-display">-</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <p class="stat-label" style="color: #1e40af;">Status</p>
+                    <p class="stat-value" style="color: #1e3a8a;" id="tracking-status">Not Tracking</p>
+                </div>
+                <div class="stat-card green">
+                    <p class="stat-label" style="color: #166534;">Refresh Rate</p>
+                    <p class="stat-value" style="color: #14532d;">3 seconds</p>
+                </div>
+                <div class="stat-card purple">
+                    <p class="stat-label" style="color: #6b21a8;">Data Source</p>
+                    <p class="stat-value" style="color: #581c87;">Real-time GPS</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <h3>How It Works</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <p style="font-weight: 600; margin: 0; margin-bottom: 0.5rem;">🚌 For Drivers:</p>
+                    <p>Click "Start Sharing Location" to broadcast your real-time position. Keep the page open while driving. Your location updates automatically.</p>
+                </div>
+                <div class="info-card">
+                    <p style="font-weight: 600; margin: 0; margin-bottom: 0.5rem;">👨‍🎓 For Students:</p>
+                    <p>Click "Start Tracking Bus" to see the bus on the interactive map. Updates every 3 seconds. Red "Stale" warning appears if no updates for 5+ minutes.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>College Bus Tracker • Real-time GPS tracking with Leaflet Maps</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize map centered on Ballari, Karnataka
+        const map = L.map('map').setView([15.3173, 75.7139], 13);
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        let busMarker = null;
+
+        // Driver functionality
+        const startBtn = document.getElementById('start-sharing');
+        const stopBtn = document.getElementById('stop-sharing');
+        const driverStatus = document.getElementById('driver-status');
+        const lastSent = document.getElementById('last-sent');
+        let watchId = null;
+
+        function saveLocation(lat, lng, accuracy) {
+            const locationData = {
+                lat: lat,
+                lng: lng,
+                timestamp: new Date().toISOString(),
+                accuracy: accuracy
+            };
+            localStorage.setItem('bus_location', JSON.stringify(locationData));
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                alert('Geolocation not supported on this device');
+                return;
+            }
+
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    saveLocation(lat, lng, accuracy);
+                    driverStatus.textContent = `Sharing: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                    lastSent.textContent = `Last sent: ${new Date().toLocaleTimeString()}`;
+                },
+                (error) => {
+                    driverStatus.textContent = `Error: ${error.message}`;
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 2000,
+                    timeout: 5000
+                }
+            );
+
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            driverStatus.textContent = 'Starting location sharing...';
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            driverStatus.textContent = 'Stopped sharing';
+            lastSent.textContent = '';
+        });
+
+        // Student functionality
+        const trackBtn = document.getElementById('track-bus');
+        const lastUpdate = document.getElementById('last-update');
+        const errorBox = document.getElementById('error-box');
+        const errorMessage = document.getElementById('error-message');
+        const locationInfo = document.getElementById('location-info');
+        const coordsDisplay = document.getElementById('coords-display');
+        const accuracyDisplay = document.getElementById('accuracy-display');
+        const trackingStatus = document.getElementById('tracking-status');
+
+        let pollInterval = null;
+        let isTracking = false;
+
+        function fetchLocation() {
+            try {
+                const dataStr = localStorage.getItem('bus_location');
+                if (!dataStr) {
+                    errorBox.style.display = 'block';
+                    errorMessage.textContent = 'No bus location available yet. Driver needs to start sharing.';
+                    locationInfo.style.display = 'none';
+                    return;
+                }
+
+                const data = JSON.parse(dataStr);
+                const updateTime = new Date(data.timestamp);
+                const now = new Date();
+                const minutesAgo = (now - updateTime) / 1000 / 60;
+                const isStale = minutesAgo > 5;
+
+                // Update map marker
+                if (!busMarker) {
+                    // Create custom bus icon
+                    const busIcon = L.divIcon({
+                        className: 'bus-marker',
+                        html: '<div style="text-align:center; line-height:24px; font-size:16px;">🚌</div>',
+                        iconSize: [30, 30]
+                    });
+                    busMarker = L.marker([data.lat, data.lng], { icon: busIcon }).addTo(map);
+                    map.setView([data.lat, data.lng], 15);
+                } else {
+                    busMarker.setLatLng([data.lat, data.lng]);
+                }
+
+                // Add accuracy circle
+                if (data.accuracy) {
+                    L.circle([data.lat, data.lng], {
+                        radius: data.accuracy,
+                        color: '#16a34a',
+                        fillColor: '#16a34a',
+                        fillOpacity: 0.1,
+                        weight: 1
+                    }).addTo(map);
+                }
+
+                // Update info displays
+                coordsDisplay.textContent = `${data.lat.toFixed(6)}, ${data.lng.toFixed(6)}`;
+                accuracyDisplay.textContent = `Accuracy: ±${Math.round(data.accuracy)}m`;
+                lastUpdate.textContent = `Updated: ${updateTime.toLocaleTimeString()}`;
+                
+                if (isStale) {
+                    lastUpdate.innerHTML += ' <span class="stale">(Stale)</span>';
+                }
+
+                locationInfo.style.display = 'block';
+                errorBox.style.display = 'none';
+
+            } catch (error) {
+                errorBox.style.display = 'block';
+                errorMessage.textContent = 'Error loading location data';
+                console.error(error);
+            }
+        }
+
+        trackBtn.addEventListener('click', () => {
+            if (isTracking) {
+                // Stop tracking
+                clearInterval(pollInterval);
+                pollInterval = null;
+                isTracking = false;
+                trackBtn.textContent = 'Start Tracking Bus';
+                trackBtn.className = 'btn-track';
+                trackingStatus.textContent = 'Not Tracking';
+            } else {
+                // Start tracking
+                fetchLocation(); // Immediate fetch
+                pollInterval = setInterval(fetchLocation, 3000);
+                isTracking = true;
+                trackBtn.textContent = 'Stop Tracking';
+                trackBtn.style.background = '#ea580c';
+                trackingStatus.textContent = 'Tracking';
+            }
+        });
+    </script>
+</body>
+</html>
